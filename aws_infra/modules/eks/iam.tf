@@ -1,7 +1,8 @@
+# modules/eks/iam.tf
 resource "aws_iam_role" "eks_roles" {
   for_each = var.roles
 
-  name = each.value.name
+  name = "${var.cluster_name}-${each.value.name}"  # Add cluster name prefix for uniqueness
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -29,9 +30,8 @@ resource "aws_iam_role_policy_attachment" "eks_policy_attachments" {
   policy_arn = each.value.policy_arn
 }
 
-
 resource "aws_iam_role" "node_role" {
-  name = "node-role"
+  name = "${var.cluster_name}-worker-node-role"  # Add cluster name prefix
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -44,7 +44,6 @@ resource "aws_iam_role" "node_role" {
     }]
   })
 }
-
 
 resource "aws_iam_role_policy_attachment" "node_policy_policy_attachment" {
   role       = aws_iam_role.node_role.name

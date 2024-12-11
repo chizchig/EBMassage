@@ -1,8 +1,12 @@
+# modules/rds/main.tf
 resource "aws_db_subnet_group" "sub_grp" {
-  name       = var.subnet_group.name
-  
-  subnet_ids = var.subnet_group.subnet_ids != null ? var.subnet_group.subnet_ids : var.private_subnet_ids
-  tags       = var.subnet_group.tags
+  name_prefix = "${var.subnet_group.name}-"  # Use name_prefix instead of fixed name
+  subnet_ids  = coalesce(var.subnet_group.subnet_ids, var.private_subnet_ids)
+  tags        = var.subnet_group.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_db_instance" "rds_instance" {
