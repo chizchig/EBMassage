@@ -2,12 +2,12 @@ variable "rds_instances" {
   description = "A map of RDS instance configurations"
   type = map(object({
     identifier             = string
+    db_name                = string
     allocated_storage      = number
     storage_type           = string
     engine                 = string
     engine_version         = string
     instance_class         = string
-    db_name                = string
     username               = string
     password               = string
     parameter_group_name   = string
