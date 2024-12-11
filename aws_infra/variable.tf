@@ -64,7 +64,7 @@ variable "cluster_name" {
 
 variable "cluster_version" {
   type    = string
-  default = "1.23"
+  default = "1.28"
 }
 
 variable "public_subnets" {
@@ -75,33 +75,33 @@ variable "public_subnets" {
 }
 
 
-variable "roles" {
-  type = map(object({
-    name     = string
-    policies = list(string)
-  }))
-  default = {
-    eks_role = {
-      name     = "eks-role"
-      policies = ["arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"]
-    }
-    node_role = {
-      name     = "node-role"
-      policies = [
-        "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
-        "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-        "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-      ]
-    }
-  }
-}
+# variable "roles" {
+#   type = map(object({
+#     name     = string
+#     policies = list(string)
+#   }))
+#   default = {
+#     eks_role = {
+#       name     = "eks-role"
+#       policies = ["arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"]
+#     }
+#     node_role = {
+#       name     = "node-role"
+#       policies = [
+#         "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+#         "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+#         "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+#       ]
+#     }
+#   }
+# }
 
-output "public_subnets" {
-  value = {
-    for subnet in aws_subnet.public :
-    subnet.id => subnet.id
-  }
-}
+# output "public_subnets" {
+#   value = {
+#     for subnet in aws_subnet.public :
+#     subnet.id => subnet.id
+#   }
+# }
 
 variable "roles" {
   type = map(object({
