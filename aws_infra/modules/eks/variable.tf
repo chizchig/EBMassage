@@ -1,11 +1,11 @@
 variable "cluster_name" {
   type    = string
-  default = "star-eks-cluster"
+  default = "falcon-eks-cluster"
 }
 
 variable "cluster_version" {
   type    = string
-  default = "1.24"
+  default = "1.28"
 }
 
 variable "public_subnets" {

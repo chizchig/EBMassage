@@ -1,4 +1,4 @@
-name           = "star"
+name           = "falcon"
 vpc_cidr_block = "192.168.0.0/16"
 azs            = ["us-east-1a", "us-east-1b", "us-east-1c"]
 node_groups = {
@@ -104,12 +104,13 @@ security_groups = {
 
 rds_instances = {
   "instance1" = {
+    identifier             = "massage-website-db"
     allocated_storage    = 20
     storage_type         = "gp2"
     engine               = "mysql"
     engine_version       = "8.0.39"
     instance_class       = "db.t3.micro"
-    db_name              = "mydb"
+    # db_name              = "mydb"
     username             = "admin"
     password             = "password123"  # Use secure password management in production
     parameter_group_name = "default.mysql8.0"

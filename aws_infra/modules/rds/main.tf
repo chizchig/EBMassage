@@ -7,13 +7,15 @@ resource "aws_db_subnet_group" "sub_grp" {
 
 resource "aws_db_instance" "rds_instance" {
   for_each = var.rds_instances
+  
+  identifier           = each.value.identifier
+  # db_name             = each.value.db_name
 
   allocated_storage    = each.value.allocated_storage
   storage_type         = each.value.storage_type
   engine               = each.value.engine
   engine_version       = each.value.engine_version
   instance_class       = each.value.instance_class
-  name                 = each.value.db_name
   username             = each.value.username
   password             = each.value.password
   parameter_group_name = each.value.parameter_group_name
