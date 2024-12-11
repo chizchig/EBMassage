@@ -58,6 +58,7 @@ module "rds" {
   rds_instances = {
     for k, v in var.rds_instances : k => merge(v, {
       vpc_security_group_ids = values(module.security_group.security_group_ids)  # Use all security group IDs
+      identifier = v.identifier  # Explicitly preserve the identifier
 
     })
   }
