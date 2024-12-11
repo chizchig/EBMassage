@@ -7,7 +7,7 @@ variable "rds_instances" {
     engine                 = string
     engine_version         = string
     instance_class         = string
-    name                   = string
+    db_name                = string
     username               = string
     password               = string
     parameter_group_name   = string
