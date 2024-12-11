@@ -9,7 +9,7 @@ resource "aws_db_instance" "rds_instance" {
   for_each = var.rds_instances
   
   identifier           = each.value.identifier
-  # db_name             = each.value.db_name
+  name                 = each.value.db_name
 
   allocated_storage    = each.value.allocated_storage
   storage_type         = each.value.storage_type
