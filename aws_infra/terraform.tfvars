@@ -104,7 +104,7 @@ security_groups = {
 
 rds_instances = {
   "instance1" = {
-    identifier             = "massage-website-db"
+    identifier           = "massage-website-db"
     allocated_storage    = 20
     storage_type         = "gp2"
     engine               = "mysql"
