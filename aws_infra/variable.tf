@@ -139,6 +139,7 @@ variable "security_groups" {
 variable "rds_instances" {
   description = "A map of RDS instance configurations"
   type = map(object({
+    identifier             = string
     allocated_storage      = number
     storage_type           = string
     engine                 = string
