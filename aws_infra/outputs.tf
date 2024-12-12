@@ -39,8 +39,19 @@ output "debug_security_group_ids" {
   value = module.security_group.security_group_ids
 }
 
-# Output the repository URI
+# outputs.tf
 output "ecr_repository_url" {
-  value       = aws_ecr_repository.cloud_index.repository_url
   description = "The URL of the ECR repository"
+  value       = aws_ecr_repository.cloud_index.repository_url
+}
+
+# Additional useful outputs you might want
+output "ecr_repository_arn" {
+  description = "The ARN of the ECR repository"
+  value       = aws_ecr_repository.cloud_index.arn
+}
+
+output "ecr_repository_registry_id" {
+  description = "The registry ID where the repository was created"
+  value       = aws_ecr_repository.cloud_index.registry_id
 }

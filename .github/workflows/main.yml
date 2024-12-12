@@ -16,13 +16,15 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./aws_infra  # Add this section to specify the working directory
+        working-directory: ./aws_infra
+    outputs:
+      ecr_repository_url: ${{ steps.terraform-output.outputs.ecr_url }}  # Added outputs section
 
     steps:
     - name: 'Checkout'
       uses: actions/checkout@v4
 
-    - name: 'Terraform'
+    - name: 'Configure AWS Credentials'
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
@@ -41,20 +43,21 @@ jobs:
 
     - name: Terraform Plan
       run: terraform plan -no-color
- 
-    # - name: Terraform Apply
-    #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    #   run: terraform apply -auto-approve
 
-    - name: Terraform Destroy
-      if: github.ref == 'refs/heads/master' && github
-      run: terraform destroy -auto-approve
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      run: terraform apply -auto-approve
+
     - name: Get Terraform Outputs
       id: terraform-output
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: |
-        ECR_URL=$(terraform output -raw ecr_repository_url)
-        echo "ecr_url=${ECR_URL}" >> $GITHUB_OUTPUT
+        if output=$(terraform output -raw ecr_repository_url 2>&1); then
+          echo "ecr_url=${output}" >> $GITHUB_OUTPUT
+        else
+          echo "Error getting ECR URL: ${output}"
+          exit 1
+        fi
 
   build-and-push:
     runs-on: ubuntu-latest
@@ -70,7 +73,7 @@ jobs:
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         aws-region: us-east-1
-        role-session-name: GitHubAction-${{ github.run_id}}
+        role-session-name: GitHubActions-${{ github.run_id }}
 
     - name: 'Login to Amazon ECR'
       id: login-ecr
