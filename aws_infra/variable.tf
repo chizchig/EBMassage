@@ -195,11 +195,6 @@ variable "untagged_image_expiration_days" {
   default     = 30
 }
 
-variable "untagged_image_expiration_days" {
-  description = "Number of days before an untagged image expires"
-  type        = number
-  default     = 30
-}
 
 variable "encryption_type" {
   description = "The encryption type to use for the repository. Valid values are AES256 or KMS"
@@ -213,8 +208,3 @@ variable "kms_key_arn" {
   default     = null
 }
 
-variable "tags" {
-  description = "A map of tags to assign to the resource"
-  type        = map(string)
-  default     = {}
-}
