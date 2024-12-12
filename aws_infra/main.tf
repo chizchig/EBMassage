@@ -74,6 +74,8 @@ module "rds" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 # Create an Amazon ECR repository
 resource "aws_ecr_repository" "cloud_index" {
   name                 = var.ecr_repository_name
