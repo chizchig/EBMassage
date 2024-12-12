@@ -59,6 +59,10 @@ jobs:
           exit 1
         fi
 
+    -  name: Terraform Destroy
+       if: github.ref == 'refs/heads/master' && github
+       run: terraform destroy -auto-approve
+
   build-and-push:
     runs-on: ubuntu-latest
     needs: deploy-infrastructure
