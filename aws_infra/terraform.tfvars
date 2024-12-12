@@ -135,3 +135,5 @@ subnet_group = {
     Environment = "production"
   }
 }
+
+ ecr_repository_name = "dev_sec"

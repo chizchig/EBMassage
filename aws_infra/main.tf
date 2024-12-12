@@ -73,3 +73,52 @@ module "rds" {
     }
   }
 }
+
+# Create an Amazon ECR repository
+resource "aws_ecr_repository" "cloud_index" {
+  name                 = var.ecr_repository_name
+  image_tag_mutability = var.image_tag_mutability
+
+  # Enable image scanning on push
+  image_scanning_configuration {
+    scan_on_push = var.scan_on_push
+  }
+
+  # Encrypt the repository
+  encryption_configuration {
+    encryption_type = var.encryption_type
+    kms_key         = var.kms_key_arn
+  }
+
+  tags = merge(
+    var.tags,
+    {
+      Name      = var.ecr_repository_name
+      ManagedBy = "Terraform"
+      AccountID = data.aws_caller_identity.current.account_id
+    }
+  )
+}
+
+# Create a lifecycle policy for the ECR repository
+resource "aws_ecr_lifecycle_policy" "cloud_index" {
+  repository = aws_ecr_repository.cloud_index.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Expire untagged images older than ${var.untagged_image_expiration_days} days"
+        selection = {
+          tagStatus   = "untagged"
+          countType   = "sinceImagePushed"
+          countUnit   = "days"
+          countNumber = var.untagged_image_expiration_days
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+}

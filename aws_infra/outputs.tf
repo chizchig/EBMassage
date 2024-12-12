@@ -38,3 +38,9 @@ output "private_subnet_ids" {
 output "debug_security_group_ids" {
   value = module.security_group.security_group_ids
 }
+
+# Output the repository URI
+output "ecr_repository_url" {
+  value       = aws_ecr_repository.cloud_index.repository_url
+  description = "The URL of the ECR repository"
+}

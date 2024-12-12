@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+  deploy-infrastructure:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -49,3 +49,37 @@ jobs:
     - name: Terraform Destroy
       if: github.ref == 'refs/heads/master' && github
       run: terraform destroy -auto-approve
+    - name: Get Terraform Outputs
+      id: terraform-output
+      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      run: |
+        ECR_URL=$(terraform output -raw ecr_repository_url)
+        echo "ecr_url=${ECR_URL}" >> $GITHUB_OUTPUT
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: deploy-infrastructure
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+
+    steps:
+    - name: 'Checkout code'
+      uses: actions/checkout@v4
+
+    - name: 'Configure AWS credentials'
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: us-east-1
+        role-session-name: GitHubAction-${{ github.run_id}}
+
+    - name: 'Login to Amazon ECR'
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build and push Docker image
+      env:
+        ECR_REGISTRY: ${{ needs.deploy-infrastructure.outputs.ecr_repository_url }}
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY:$IMAGE_TAG
