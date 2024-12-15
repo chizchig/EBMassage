@@ -107,8 +107,8 @@ rds_instances = {
     identifier           = "massage-website-db"
     allocated_storage    = 20
     storage_type         = "gp2"
-    engine               = "mysql"
-    engine_version       = "8.4.3"
+    engine               = "aurora-mysql"
+    engine_version       = "8.0.mysql_aurora.3.04.0"
     instance_class       = "db.t3.micro"
     db_name              = "mydb"
     username             = "admin"
@@ -136,4 +136,4 @@ subnet_group = {
   }
 }
 
- ecr_repository_name = "dev_sec"
+ ecr_repository_name = "falcon_ecr"
