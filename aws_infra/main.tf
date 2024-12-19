@@ -124,3 +124,40 @@ resource "aws_ecr_lifecycle_policy" "cloud_index" {
     ]
   })
 }
+
+resource "kubernetes_manifest" "deployment" {
+  manifest = yamldecode(file("${path.module}/k8s/deployment.yaml"))
+  depends_on = [module.eks]
+}
+
+resource "kubernetes_manifest" "service" {
+  manifest = yamldecode(file("${path.module}/k8s/service.yaml"))
+  depends_on = [module.eks]
+}
+
+resource "kubernetes_manifest" "ingress" {
+  manifest = yamldecode(file("${path.module}/k8s/ingress.yaml"))
+  depends_on = [module.eks]
+}
+
+# resource "helm_release" "aws_load_balancer_controller" {
+#   name       = "aws-load-balancer-controller"
+#   repository = "https://aws.github.io/eks-charts"
+#   chart      = "aws-load-balancer-controller"
+#   namespace  = "kube-system"
+
+#   set {
+#     name  = "clusterName"
+#     value = var.cluster_name
+#   }
+
+#   set {
+#     name  = "serviceAccount.create"
+#     value = "true"
+#   }
+
+#   # set {
+#   #   name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+#   #   value = aws_iam_role.lb_controller.arn
+#   # }
+# }

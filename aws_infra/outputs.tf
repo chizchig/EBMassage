@@ -55,3 +55,7 @@ output "ecr_repository_registry_id" {
   description = "The registry ID where the repository was created"
   value       = aws_ecr_repository.cloud_index.registry_id
 }
+
+output "cluster_endpoint" {
+  value = module.eks.cluster_endpoint
+}

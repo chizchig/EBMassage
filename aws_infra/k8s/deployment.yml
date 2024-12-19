@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: massage-website
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: massage-website
+  template:
+    metadata:
+      labels:
+        app: massage-website
+    spec:
+      containers:
+      - name: massage-website
+        image: ${aws_ecr_repository.cloud_index.repository_url}:latest
+        ports:
+        - containerPort: 5001
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"

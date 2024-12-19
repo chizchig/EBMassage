@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: massage-website-ingress
+  annotations:
+    kubernetes.io/ingress.class: "alb"
+    alb.ingress.kubernetes.io/scheme: "internet-facing"
+    alb.ingress.kubernetes.io/target-type: "ip"
+    # Add your EKS cluster host
+    external-dns.alpha.kubernetes.io/hostname: "your-eks-cluster-endpoint"
+spec:
+  rules:
+  - host: your-eks-cluster-endpoint  # Add your EKS cluster endpoint
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: massage-website-service
+            port:
+              number: 80
