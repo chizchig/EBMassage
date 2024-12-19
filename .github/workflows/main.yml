@@ -17,8 +17,8 @@ jobs:
     defaults:
       run:
         working-directory: ./aws_infra
-    # outputs:
-    #   ecr_repository_url: ${{ steps.terraform-output.outputs.ecr_url }}  # Added outputs section
+    outputs:
+      ecr_repository_url: ${{ steps.terraform-output.outputs.ecr_url }}  # Added outputs section
 
     steps:
     - name: 'Checkout'
@@ -92,6 +92,7 @@ jobs:
     - name: Build and push Docker image
       env:
         ECR_REGISTRY: ${{ steps.ecr-registry.outputs.registry }}
+        # REPO_NAME: "falcon_ecr"
         IMAGE_TAG: ${{ github.sha }}
       run: |
         # Debug output
