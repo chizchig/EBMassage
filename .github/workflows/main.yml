@@ -86,7 +86,15 @@ jobs:
     - name: Build and push Docker image
       env:
         ECR_REGISTRY: ${{ needs.deploy-infrastructure.outputs.ecr_repository_url }}
-        IMAGE_TAG: latest
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY:$IMAGE_TAG
+        # Debug output
+        echo "Building for registry: $ECR_REGISTRY"
+        echo "Building with tag: $IMAG_TAG"
+
+        # Build and tag with both SHA and latest
+        docker build -t ${ECR_REGISTRY}:${IMAGE_TAG} -t ${ECR_REGISTRY}:latest .
+
+        # Push both tags
+        docker push ${ECR_REGISTRY}:${IMAGE_TAG}
+        docker push ${ECR_REGISTRY}:latest
