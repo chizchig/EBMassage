@@ -69,36 +69,39 @@ jobs:
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
 
     steps:
-    - name: 'Checkout code'
+    - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: 'Configure AWS credentials'
+    - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         aws-region: us-east-1
         role-session-name: GitHubActions-${{ github.run_id }}
 
-    - name: 'Login to Amazon ECR'
+    - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
+    - name: Get ECR Registry
+      id: ecr-registry
+      run: |
+        ECR_REGISTRY="${{ steps.login-ecr.outputs.registry }}/massage-website"
+        echo "registry=${ECR_REGISTRY}" >> $GITHUB_OUTPUT
+
     - name: Build and push Docker image
       env:
-        ECR_REGISTRY: ${{ needs.deploy-infrastructure.outputs.ecr_repository_url }}
+        ECR_REGISTRY: ${{ steps.ecr-registry.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         # Debug output
         echo "Building for registry: $ECR_REGISTRY"
-        echo "Building with tag: $IMAG_TAG"
-
+        echo "Building with tag: $IMAGE_TAG"
+        
         # Build and tag with both SHA and latest
-        docker build -t ${ECR_REGISTRY}:${IMAGE_TAG} -t ${ECR_REGISTRY}:latest .
-
+        docker build -t ${ECR_REGISTRY}:${IMAGE_TAG} .
+        docker tag ${ECR_REGISTRY}:${IMAGE_TAG} ${ECR_REGISTRY}:latest
+        
         # Push both tags
         docker push ${ECR_REGISTRY}:${IMAGE_TAG}
         docker push ${ECR_REGISTRY}:latest
-
-        docker build -t $ECR_REGISTRY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY:$IMAGE_TAG
-
