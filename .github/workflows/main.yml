@@ -44,20 +44,20 @@ jobs:
     - name: Terraform Plan
       run: terraform plan -no-color
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      run: terraform apply -auto-approve
+    # - name: Terraform Apply
+    #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    #   run: terraform apply -auto-approve
 
-    - name: Get Terraform Outputs
-      id: terraform-output
-      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      run: |
-        if output=$(terraform output -raw ecr_repository_url 2>&1); then
-          echo "ecr_url=${output}" >> $GITHUB_OUTPUT
-        else
-          echo "Error getting ECR URL: ${output}"
-          exit 1
-        fi
+    # - name: Get Terraform Outputs
+    #   id: terraform-output
+    #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    #   run: |
+    #     if output=$(terraform output -raw ecr_repository_url 2>&1); then
+    #       echo "ecr_url=${output}" >> $GITHUB_OUTPUT
+    #     else
+    #       echo "Error getting ECR URL: ${output}"
+    #       exit 1
+    #     fi
 
     # -  name: Terraform Destroy
     #    if: github.ref == 'refs/heads/master' && github
@@ -92,7 +92,7 @@ jobs:
     - name: Build and push Docker image
       env:
         ECR_REGISTRY: ${{ steps.ecr-registry.outputs.registry }}
-        # REPO_NAME: "falcon_ecr"
+        REPO_NAME: "falcon_ecr"
         IMAGE_TAG: ${{ github.sha }}
       run: |
         # Debug output
