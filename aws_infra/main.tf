@@ -126,17 +126,17 @@ resource "aws_ecr_lifecycle_policy" "cloud_index" {
 }
 
 resource "kubernetes_manifest" "deployment" {
-  manifest = yamldecode(file("${path.root}/k8s/deployment.yaml"))
+  manifest = yamldecode(file("./module/k8s/deployment.yaml"))
   depends_on = [module.eks]
 }
 
 resource "kubernetes_manifest" "service" {
-  manifest = yamldecode(file("${path.root}/k8s/service.yaml"))
+  manifest = yamldecode(file("./module/k8s/service.yaml"))
   depends_on = [module.eks]
 }
 
 resource "kubernetes_manifest" "ingress" {
-  manifest = yamldecode(file("${path.root}/k8s/ingress.yaml"))
+  manifest = yamldecode(file("./module/k8s/ingress.yaml"))
   depends_on = [module.eks]
 }
 
