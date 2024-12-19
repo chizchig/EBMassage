@@ -88,7 +88,6 @@ jobs:
         ECR_REGISTRY: ${{ needs.deploy-infrastructure.outputs.ecr_repository_url }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-<<<<<<< HEAD
         # Debug output
         echo "Building for registry: $ECR_REGISTRY"
         echo "Building with tag: $IMAG_TAG"
@@ -99,7 +98,7 @@ jobs:
         # Push both tags
         docker push ${ECR_REGISTRY}:${IMAGE_TAG}
         docker push ${ECR_REGISTRY}:latest
-=======
+
         docker build -t $ECR_REGISTRY:$IMAGE_TAG .
         docker push $ECR_REGISTRY:$IMAGE_TAG
->>>>>>> origin/master
+
