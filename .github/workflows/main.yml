@@ -86,7 +86,7 @@ jobs:
     - name: Get ECR Registry
       id: ecr-registry
       run: |
-        ECR_REGISTRY="${{ steps.login-ecr.outputs.registry }}/massage-website"
+        ECR_REGISTRY="${{ steps.login-ecr.outputs.registry }}/falcon_ecr"
         echo "registry=${ECR_REGISTRY}" >> $GITHUB_OUTPUT
 
     - name: Build and push Docker image
