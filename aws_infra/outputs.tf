@@ -56,6 +56,10 @@ output "ecr_repository_registry_id" {
   value       = aws_ecr_repository.cloud_index.registry_id
 }
 
+output "cluster_name" {
+  value = module.eks.cluster_name
+}
+
 output "cluster_endpoint" {
   value = module.eks.cluster_endpoint
 }
