@@ -125,20 +125,20 @@ resource "aws_ecr_lifecycle_policy" "cloud_index" {
   })
 }
 
-resource "kubernetes_manifest" "deployment" {
-  manifest = yamldecode(file("../aws_infra/k8s/deployment.yml"))
-  depends_on = [module.eks]
-}
+# resource "kubernetes_manifest" "deployment" {
+#   manifest = yamldecode(file("../aws_infra/k8s/deployment.yml"))
+#   depends_on = [module.eks]
+# }
 
-resource "kubernetes_manifest" "service" {
-  manifest = yamldecode(file("../aws_infra/k8s/service.yml"))
-  depends_on = [module.eks]
-}
+# resource "kubernetes_manifest" "service" {
+#   manifest = yamldecode(file("../aws_infra/k8s/service.yml"))
+#   depends_on = [module.eks]
+# }
 
-resource "kubernetes_manifest" "ingress" {
-  manifest = yamldecode(file("../aws_infra/k8s/ingress.yml"))
-  depends_on = [module.eks]
-}
+# resource "kubernetes_manifest" "ingress" {
+#   manifest = yamldecode(file("../aws_infra/k8s/ingress.yml"))
+#   depends_on = [module.eks]
+# }
 
 # resource "helm_release" "aws_load_balancer_controller" {
 #   name       = "aws-load-balancer-controller"

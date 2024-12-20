@@ -59,7 +59,7 @@ variable "node_groups" {
 
 variable "cluster_name" {
   type    = string
-  default = "star-eks-cluster"
+  default = "falcon-eks-cluster"
 }
 
 variable "cluster_version" {
