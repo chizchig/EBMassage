@@ -11,26 +11,7 @@ variable "azs" {
   type = list(string)
 }
 
-# variable "public_subnets" {
-#   type = map(object({
-#     cidr = string
-#     az   = string
-#   }))
-# }
 
-# variable "private_subnets" {
-#   type = map(object({
-#     cidr = string
-#     az   = string
-#   }))
-# }
-
-# variable "database_subnets" {
-#   type = map(object({
-#     cidr = string
-#     az   = string
-#   }))
-# }
 
 variable "enable_nat_gateway" {
   type    = bool
@@ -74,35 +55,6 @@ variable "public_subnets" {
   }))
 }
 
-
-# variable "roles" {
-#   type = map(object({
-#     name     = string
-#     policies = list(string)
-#   }))
-#   default = {
-#     eks_role = {
-#       name     = "eks-role"
-#       policies = ["arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"]
-#     }
-#     node_role = {
-#       name     = "node-role"
-#       policies = [
-#         "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
-#         "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-#         "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-#       ]
-#     }
-#   }
-# }
-
-# output "public_subnets" {
-#   value = {
-#     for subnet in aws_subnet.public :
-#     subnet.id => subnet.id
-#   }
-# }
-
 variable "roles" {
   type = map(object({
     name        = string
@@ -131,10 +83,7 @@ variable "security_groups" {
   }))
 }
 
-# variable "vpc_id" {
-#   description = "The ID of the VPC where the security groups will be created"
-#   type        = string
-# }
+
 
 variable "rds_instances" {
   description = "A map of RDS instance configurations"

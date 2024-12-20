@@ -7,10 +7,10 @@ metadata:
     alb.ingress.kubernetes.io/scheme: "internet-facing"
     alb.ingress.kubernetes.io/target-type: "ip"
     # Add your EKS cluster host
-    external-dns.alpha.kubernetes.io/hostname: "your-eks-cluster-endpoint"
+    external-dns.alpha.kubernetes.io/hostname: "https://4C27E670F3E722774D98176FBDCAD63F.yl4.us-east-1.eks.amazonaws.com"
 spec:
   rules:
-  - host: your-eks-cluster-endpoint  # Add your EKS cluster endpoint
+  - host: https://4C27E670F3E722774D98176FBDCAD63F.yl4.us-east-1.eks.amazonaws.com  # Add your EKS cluster endpoint
     http:
       paths:
       - path: /
