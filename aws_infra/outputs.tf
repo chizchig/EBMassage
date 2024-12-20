@@ -61,7 +61,7 @@ output "cluster_name" {
 }
 
 output "cluster_ca_certificate" {
-  value = aws_eks_cluster.eks_cluster.certificate_authority[0].data
+  value = module.eks.cluster_ca_certificate
 }
 
 output "cluster_endpoint" {
