@@ -131,9 +131,9 @@ resource "null_resource" "k8s_deploy" {
   provisioner "local-exec" {
     command = <<-EOT
       aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-east-1
-      kubectl apply -f k8s/deployment.yaml
-      kubectl apply -f k8s/service.yaml
-      kubectl apply -f k8s/ingress.yaml
+      kubectl apply -f ../aws_infra/k8s/k8s/deployment.yaml
+      kubectl apply -f ../aws_infra/k8s/k8s/service.yaml
+      kubectl apply -f ../aws_infra/k8s/k8s/ingress.yaml
     EOT
   }
 }
