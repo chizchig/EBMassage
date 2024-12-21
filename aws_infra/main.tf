@@ -129,11 +129,13 @@ resource "null_resource" "k8s_deploy" {
   depends_on = [module.eks]
 
   provisioner "local-exec" {
+    working_dir = path.module  # Set working directory
+
     command = <<-EOT
-      aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-east-1
-      kubectl apply -f ../aws_infra/k8s/k8s/deployment.yaml
-      kubectl apply -f ../aws_infra/k8s/k8s/service.yaml
-      kubectl apply -f ../aws_infra/k8s/k8s/ingress.yaml
+      aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-east-1 &&
+      kubectl apply -f ${abspath(path.root)}/k8s/deployment.yaml &&
+      kubectl apply -f ${abspath(path.root)}/k8s/service.yaml &&
+      kubectl apply -f ${abspath(path.root)}/k8s/ingress.yaml
     EOT
   }
 }
