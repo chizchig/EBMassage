@@ -125,35 +125,35 @@ resource "aws_ecr_lifecycle_policy" "cloud_index" {
   })
 }
 
-resource "null_resource" "k8s_deploy" {
+# resource "null_resource" "k8s_deploy" {
+#   depends_on = [module.eks]
+
+#   provisioner "local-exec" {
+#     working_dir = path.module  # Set working directory
+
+#     command = <<-EOT
+#       aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-east-1 &&
+#       kubectl apply -f ${abspath(path.root)}/k8s/deployment.yaml &&
+#       kubectl apply -f ${abspath(path.root)}/k8s/service.yaml &&
+#       kubectl apply -f ${abspath(path.root)}/k8s/ingress.yaml
+#     EOT
+#   }
+# }
+
+resource "kubernetes_manifest" "deployment" {
+  manifest = yamldecode(file("../aws_infra/k8s/deployment.yml"))
   depends_on = [module.eks]
-
-  provisioner "local-exec" {
-    working_dir = path.module  # Set working directory
-
-    command = <<-EOT
-      aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-east-1 &&
-      kubectl apply -f ${abspath(path.root)}/k8s/deployment.yaml &&
-      kubectl apply -f ${abspath(path.root)}/k8s/service.yaml &&
-      kubectl apply -f ${abspath(path.root)}/k8s/ingress.yaml
-    EOT
-  }
 }
 
-# resource "kubernetes_manifest" "deployment" {
-#   manifest = yamldecode(file("../aws_infra/k8s/deployment.yml"))
-#   depends_on = [module.eks]
-# }
+resource "kubernetes_manifest" "service" {
+  manifest = yamldecode(file("../aws_infra/k8s/service.yml"))
+  depends_on = [module.eks]
+}
 
-# resource "kubernetes_manifest" "service" {
-#   manifest = yamldecode(file("../aws_infra/k8s/service.yml"))
-#   depends_on = [module.eks]
-# }
-
-# resource "kubernetes_manifest" "ingress" {
-#   manifest = yamldecode(file("../aws_infra/k8s/ingress.yml"))
-#   depends_on = [module.eks]
-# }
+resource "kubernetes_manifest" "ingress" {
+  manifest = yamldecode(file("../aws_infra/k8s/ingress.yml"))
+  depends_on = [module.eks]
+}
 
 # resource "helm_release" "aws_load_balancer_controller" {
 #   name       = "aws-load-balancer-controller"
