@@ -129,13 +129,14 @@ resource "null_resource" "k8s_deploy" {
   depends_on = [module.eks]
 
   provisioner "local-exec" {
-    command = <<-EOT
-      aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-east-1 &&
-      kubectl apply -f ../aws_infra/k8s/deployment.yaml &&
-      kubectl apply -f ../aws_infra/k8s/service.yaml &&
-      kubectl apply -f ../aws_infra/k8s/ingress.yaml
-    EOT
-  }
+  command = <<EOT
+    aws eks update-kubeconfig --name falcon-eks-cluster --region us-east-1 &&
+    kubectl apply -f ./k8s/deployment.yaml &&
+    kubectl apply -f ./k8s/service.yaml &&
+    kubectl apply -f ./k8s/ingress.yaml
+  EOT
+ }
+
 }
 
 # resource "helm_release" "aws_load_balancer_controller" {
