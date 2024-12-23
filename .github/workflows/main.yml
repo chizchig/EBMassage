@@ -43,15 +43,15 @@ jobs:
       with:
         terraform_wrapper: false
 
-    - name: Terraform Init
-      run: terraform init
+    # - name: Terraform Init
+    #   run: terraform init
 
-    - name: Terraform Plan
-      run: terraform plan -no-color
+    # - name: Terraform Plan
+    #   run: terraform plan -no-color
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-      run: terraform apply -auto-approve
+    # - name: Terraform Apply
+    #   if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    #   run: terraform apply -auto-approve
 
     - name: Get Terraform Outputs
       id: terraform-output
@@ -63,6 +63,7 @@ jobs:
         echo "ecr_url=${ECR_URL}" >> $GITHUB_OUTPUT
         echo "REPO_NAME=falcon_ecr" >> $GITHUB_ENV
         echo "cluster_name=${CLUSTER_NAME}" >> $GITHUB_OUTPUT
+        echo "image_tag=${IMAGE_TAG}" >> $GITHUB_ENV  # Save image_tag as an environment variable
 
   build-and-push:
     runs-on: ubuntu-latest
