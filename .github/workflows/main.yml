@@ -58,8 +58,10 @@ jobs:
       if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       run: |
         ECR_URL=$(terraform output -raw ecr_repository_url)
+        IMAGE_TAG=$(terraform output -raw image_tag)  # Get dynamic image tag (e.g., Git commit)
         CLUSTER_NAME=$(terraform output -raw cluster_name)
         echo "ecr_url=${ECR_URL}" >> $GITHUB_OUTPUT
+        echo "REPO_NAME=falcon_ecr" >> $GITHUB_ENV
         echo "cluster_name=${CLUSTER_NAME}" >> $GITHUB_OUTPUT
 
   build-and-push:

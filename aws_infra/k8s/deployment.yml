@@ -2,8 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: massage-website
+  labels:
+    app: massage-website
 spec:
   replicas: 2
+  progressDeadlineSeconds: 300
   selector:
     matchLabels:
       app: massage-website
@@ -13,14 +16,29 @@ spec:
         app: massage-website
     spec:
       containers:
-      - name: massage-website
-        image: ${aws_ecr_repository.cloud_index.repository_url}:latest
-        ports:
-        - containerPort: 5001
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
+        - name: massage-website
+          image: "${ECR_REGISTRY}/${REPO_NAME}:${IMAGE_TAG}" # Placeholder for dynamic substitution
+          ports:
+            - containerPort: 80
+          env:
+            - name: AWS_REGION
+              value: "us-east-1"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
