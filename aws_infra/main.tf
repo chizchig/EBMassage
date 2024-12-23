@@ -129,14 +129,20 @@ resource "null_resource" "k8s_deploy" {
   depends_on = [module.eks]
 
   provisioner "local-exec" {
-  command = <<EOT
-    aws eks update-kubeconfig --name falcon-eks-cluster --region us-east-1 &&
-    kubectl apply -f ./k8s/deployment.yml &&
-    kubectl apply -f ./k8s/service.yml &&
-    kubectl apply -f ./k8s/ingress.yml
-  EOT
- }
-
+    command = <<-EOT
+      aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-east-1 &&
+      kubectl get nodes &&
+      echo "Applying deployment..." &&
+      envsubst < k8s/deployment.yml | kubectl apply -f - &&
+      echo "Checking pods..." &&
+      kubectl get pods -l app=massage-website &&
+      echo "Checking pod logs..." &&
+      kubectl logs -l app=massage-website --tail=50 &&
+      kubectl apply -f k8s/service.yml &&
+      kubectl apply -f k8s/ingress.yml &&
+      kubectl rollout status deployment/massage-website --timeout=300s
+    EOT
+  }
 }
 
 # resource "helm_release" "aws_load_balancer_controller" {
