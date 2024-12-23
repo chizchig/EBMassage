@@ -157,6 +157,7 @@ jobs:
     outputs:
       ecr_repository_url: ${{ steps.terraform-output.outputs.ecr_url }}
       cluster_name: ${{ steps.terraform-output.outputs.cluster_name }}
+      image_tag: ${{ steps.terraform-output.outputs.image_tag }}
 
     steps:
     - name: Checkout
@@ -195,8 +196,10 @@ jobs:
       run: |
         ECR_URL=$(terraform output -raw ecr_repository_url)
         CLUSTER_NAME=$(terraform output -raw cluster_name)
+        IMAGE_TAG=$(terraform output -raw image_tag)
         echo "ecr_url=${ECR_URL}" >> $GITHUB_OUTPUT
         echo "cluster_name=${CLUSTER_NAME}" >> $GITHUB_OUTPUT
+        echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
   build-and-push:
     runs-on: ubuntu-latest
@@ -266,3 +269,12 @@ jobs:
         
         # Wait for deployment
         kubectl rollout status deployment/massage-website
+
+        # Check logs if deployment fails
+        if [[ $? -ne 0 ]]; then
+          echo "Deployment failed. Fetching logs..."
+          kubectl logs -l app=massage-website
+          exit 1
+        fi
+
+        echo "Deployment completed successfully!"
