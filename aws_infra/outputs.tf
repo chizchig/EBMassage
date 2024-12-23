@@ -67,3 +67,8 @@ output "cluster_ca_certificate" {
 output "cluster_endpoint" {
   value = module.eks.cluster_endpoint
 }
+
+output "image_tag" {
+  description = "The tag for the Docker image"
+  value       = "latest"  # Or another dynamic value if needed
+}
