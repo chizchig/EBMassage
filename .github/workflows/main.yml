@@ -256,35 +256,6 @@ jobs:
       run: |
         aws eks update-kubeconfig --name ${{ needs.deploy-infrastructure.outputs.cluster_name }} --region us-east-1
 
-    - name: Clean up old resources
-      run: |
-        echo "Cleaning up old deployment resources..."
-        # Delete old deployment if exists
-        kubectl delete deployment massage-website --ignore-not-found=true
-        
-        # Force delete any stuck pods
-        kubectl get pods -l app=massage-website -o name | xargs -r kubectl delete --force --grace-period=0
-        
-        # Clean up old ReplicaSets
-        kubectl delete rs -l app=massage-website --ignore-not-found=true
-        
-        # Wait for cleanup to complete
-        sleep 10
-        
-        echo "Checking cluster node status..."
-        kubectl get nodes
-        
-        echo "Checking node group status..."
-        CLUSTER_NAME="${{ needs.deploy-infrastructure.outputs.cluster_name }}"
-        aws eks list-nodegroups --cluster-name $CLUSTER_NAME
-        
-        # Get first nodegroup name
-        NODEGROUP_NAME=$(aws eks list-nodegroups --cluster-name $CLUSTER_NAME --query 'nodegroups[0]' --output text)
-        
-        if [ ! -z "$NODEGROUP_NAME" ]; then
-          echo "Checking nodegroup details..."
-          aws eks describe-nodegroup --cluster-name $CLUSTER_NAME --nodegroup-name $NODEGROUP_NAME
-        fi
 
     - name: Deploy to Kubernetes
       env:
