@@ -256,18 +256,64 @@ jobs:
       run: |
         aws eks update-kubeconfig --name ${{ needs.deploy-infrastructure.outputs.cluster_name }} --region us-east-1
 
+    - name: Clean up old resources
+      run: |
+        echo "Cleaning up old deployment resources..."
+        # Delete old deployment if exists
+        kubectl delete deployment massage-website --ignore-not-found=true
+        
+        # Force delete any stuck pods
+        kubectl get pods -l app=massage-website -o name | xargs -r kubectl delete --force --grace-period=0
+        
+        # Clean up old ReplicaSets
+        kubectl delete rs -l app=massage-website --ignore-not-found=true
+        
+        # Wait for cleanup to complete
+        sleep 10
+        
+        echo "Checking cluster node status..."
+        kubectl get nodes
+        
+        echo "Checking node group status..."
+        CLUSTER_NAME="${{ needs.deploy-infrastructure.outputs.cluster_name }}"
+        aws eks list-nodegroups --cluster-name $CLUSTER_NAME
+        
+        # Get first nodegroup name
+        NODEGROUP_NAME=$(aws eks list-nodegroups --cluster-name $CLUSTER_NAME --query 'nodegroups[0]' --output text)
+        
+        if [ ! -z "$NODEGROUP_NAME" ]; then
+          echo "Checking nodegroup details..."
+          aws eks describe-nodegroup --cluster-name $CLUSTER_NAME --nodegroup-name $NODEGROUP_NAME
+        fi
+
     - name: Deploy to Kubernetes
       env:
         ECR_REGISTRY: ${{ needs.deploy-infrastructure.outputs.ecr_repository_url }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
         cd aws_infra
+        
+        # Cleanup old resources first
+        echo "Cleaning up old deployment resources..."
+        kubectl delete deployment massage-website --ignore-not-found=true
+        kubectl get pods -l app=massage-website -o name | xargs -r kubectl delete --force --grace-period=0
+        kubectl delete rs -l app=massage-website --ignore-not-found=true
+        
+        # Wait for cleanup to complete
+        echo "Waiting for cleanup to complete..."
+        sleep 10
+        
+        # Check cluster status
+        echo "Checking cluster status..."
+        kubectl get nodes
+        
         # Apply the manifests
+        echo "Applying new deployment..."
         envsubst < k8s/deployment.yml | kubectl apply -f -
         kubectl apply -f k8s/service.yml
         kubectl apply -f k8s/ingress.yml
         
-        # Add these debugging commands
+        # Add debugging commands
         echo "Checking pod status..."
         kubectl get pods -l app=massage-website
         
@@ -275,7 +321,22 @@ jobs:
         kubectl describe pods -l app=massage-website
         
         echo "Checking pod logs..."
-        kubectl logs -l app=massage-website --all-containers=true
+        kubectl logs -l app=massage-website --all-containers=true || true
+        
+        # Check node group status if pods are pending
+        if kubectl get pods -l app=massage-website | grep -q 'Pending'; then
+          echo "Pods are pending, checking node group status..."
+          CLUSTER_NAME=$(aws eks list-clusters --query 'clusters[0]' --output text)
+          NODEGROUP_NAME=$(aws eks list-nodegroups --cluster-name $CLUSTER_NAME --query 'nodegroups[0]' --output text)
+          aws eks describe-nodegroup --cluster-name $CLUSTER_NAME --nodegroup-name $NODEGROUP_NAME
+        fi
         
         # Then attempt the rollout
+        echo "Waiting for deployment rollout..."
         kubectl rollout status deployment/massage-website --timeout=300s
+        
+        if [[ $? -ne 0 ]]; then
+          echo "Deployment failed. Fetching additional debug info..."
+          kubectl get events --sort-by='.metadata.creationTimestamp' | grep massage-website
+          exit 1
+        fi
