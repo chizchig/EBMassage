@@ -262,19 +262,20 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
       run: |
         cd aws_infra
-        # Replace placeholders in manifests
+        # Apply the manifests
         envsubst < k8s/deployment.yml | kubectl apply -f -
         kubectl apply -f k8s/service.yml
         kubectl apply -f k8s/ingress.yml
         
-        # Wait for deployment
-        kubectl rollout status deployment/massage-website
-
-        # Check logs if deployment fails
-        if [[ $? -ne 0 ]]; then
-          echo "Deployment failed. Fetching logs..."
-          kubectl logs -l app=massage-website
-          exit 1
-        fi
-
-        echo "Deployment completed successfully!"
+        # Add these debugging commands
+        echo "Checking pod status..."
+        kubectl get pods -l app=massage-website
+        
+        echo "Checking pod details..."
+        kubectl describe pods -l app=massage-website
+        
+        echo "Checking pod logs..."
+        kubectl logs -l app=massage-website --all-containers=true
+        
+        # Then attempt the rollout
+        kubectl rollout status deployment/massage-website --timeout=300s
